@@ -13,24 +13,24 @@ def main():
   FPS = 50
 
   
-  tutorial_img = pygame.image.load('Menu/images/button_tutorial.png').convert_alpha()
-  hovert_img = pygame.image.load('Menu/images/button_hover2.png').convert_alpha()
+  tutorial_img = pygame.image.load('Pygame/teste/images/button_tutorial.png').convert_alpha()
+  hovert_img = pygame.image.load('Pygame/teste/images/button_hover2.png').convert_alpha()
   tutorial_button = tutorial_img.get_rect(center=(1588,85))
 
-  singleplayer_img = pygame.image.load('Menu/images/button_singleplayer.png').convert_alpha()
+  singleplayer_img = pygame.image.load('Pygame/teste/images/button_singleplayer.png').convert_alpha()
   singleplayer_button = singleplayer_img.get_rect(center=(912,532))
 
-  multiplayer_img = pygame.image.load('Menu/images/button_multiplayer.png').convert_alpha()
+  multiplayer_img = pygame.image.load('Pygame/teste/images/button_multiplayer.png').convert_alpha()
   multiplayer_button = multiplayer_img.get_rect(center=(1038,696))
 
-  customize_img = pygame.image.load('Menu/images/button_customize.png').convert_alpha()
-  hover_img = pygame.image.load('Menu/images/button_hover.png').convert_alpha()
+  customize_img = pygame.image.load('Pygame/teste/images/button_customize.png').convert_alpha()
+  hover_img = pygame.image.load('Pygame/teste/images/button_hover.png').convert_alpha()
   customize_button = customize_img.get_rect(center=(912,863))
 
 
-  tutorial_0_img = pygame.image.load('Menu/images/tutorial0.png').convert_alpha() 
-  tutorial_1_img = pygame.image.load('Menu/images/tutorial1.png').convert_alpha() 
-  tutorial_2_img = pygame.image.load('Menu/images/tutorial2.png').convert_alpha() 
+  tutorial_0_img = pygame.image.load('Pygame/teste/images/tutorial0.png').convert_alpha() 
+  tutorial_1_img = pygame.image.load('Pygame/teste/images/tutorial1.png').convert_alpha() 
+  tutorial_2_img = pygame.image.load('Pygame/teste/images/tutorial2.png').convert_alpha() 
 
   tutorial_0 = tutorial_0_img.get_rect(center=(960,600)) 
   tutorial_1 = tutorial_1_img.get_rect(center=(960,600)) 
@@ -39,20 +39,20 @@ def main():
   tutorial_imgs = {0: tutorial_0_img, 1: tutorial_1_img, 2: tutorial_2_img} 
   tutorial_coords = {0: tutorial_0, 1: tutorial_1, 2: tutorial_2} 
 
-  tutorial_back_img = pygame.image.load('Menu/images/tutorial_back.png').convert_alpha() 
+  tutorial_back_img = pygame.image.load('Pygame/teste/images/tutorial_back.png').convert_alpha() 
   tutorial_back = tutorial_back_img.get_rect(center=(505,551)) 
 
-  tutorial_forward_img = pygame.image.load('Menu/images/tutorial_forward.png').convert_alpha() 
+  tutorial_forward_img = pygame.image.load('Pygame/teste/images/tutorial_forward.png').convert_alpha() 
   tutorial_forward = tutorial_forward_img.get_rect(center=(1405,551)) 
 
-  quit_img = pygame.image.load('Menu/images/button_quit.png').convert_alpha() 
+  quit_img = pygame.image.load('Pygame/teste/images/button_quit.png').convert_alpha() 
   quit = quit_img.get_rect(center=(200,1000)) 
 
   estado_jogo = "menu"
   musica_tocando = False
   tutorial_pg = 0
 
-  fundo = pygame.image.load("Menu/images/main4.png").convert()
+  fundo = pygame.image.load("Pygame/teste/images/main4.png").convert()
   largura_fundo = fundo.get_width()
   rect_fundo = fundo.get_rect()
   scroll = 0
@@ -86,18 +86,19 @@ def main():
       tela.blit(current_multi, multiplayer_button)
 
 
-      if not musica_tocando:
-          pygame.mixer.music.load("Menu/k.mp3")
-          pygame.mixer.music.play(loops=0)
-          musica_tocando = True
+
+     # if not musica_tocando:
+         # pygame.mixer.music.load("Menu/k.mp3")
+         # pygame.mixer.music.play(loops=0)
+         # musica_tocando = True
     
     if estado_jogo == "tutorial":
-      tutorial_page = pygame.image.load('Menu/images/tutorial_background.png').convert_alpha() 
+      tutorial_page = pygame.image.load('Pygame/teste/images/tutorial_background.png').convert_alpha() 
       screen_size = tela.get_size() 
       scaled_image = pygame.transform.scale(tutorial_page, screen_size) 
       tela.blit(scaled_image, (0, 0))
 
-      tutorial_main_img = pygame.image.load('Menu/images/tutorial_main.png').convert_alpha()
+      tutorial_main_img = pygame.image.load('Pygame/teste/images/tutorial_main.png').convert_alpha()
       tutorial_main = tutorial_main_img.get_rect(center=(960,560))
 
       tela.blit(tutorial_main_img, tutorial_main)
@@ -106,21 +107,21 @@ def main():
       tela.blit(quit_img, quit)
       tela.blit(tutorial_imgs[tutorial_pg], tutorial_coords[tutorial_pg]) 
 
-      if not musica_tocando:
-        pygame.mixer.music.load("Menu/roll.mp3")
-        pygame.mixer.music.play(loops=0)
-        musica_tocando = True
+     # if not musica_tocando:
+        # pygame.mixer.music.load("Menu/roll.mp3")
+      #  pygame.mixer.music.play(loops=0)
+      #  musica_tocando = True
       
     if estado_jogo == "custom":
-        custom_page = pygame.image.load('Menu/images/shrek.png').convert_alpha() 
+        custom_page = pygame.image.load('Pygame/teste/images/shrek.png').convert_alpha() 
         screen_size = tela.get_size() 
         scaled_image = pygame.transform.scale(custom_page, screen_size) 
         tela.blit(scaled_image, (0, 0))
         tela.blit(quit_img, quit)
-        if not musica_tocando:
-          pygame.mixer.music.load("Menu/pain.mp3")
-          pygame.mixer.music.play(loops=0)
-          musica_tocando = True
+      #  if not musica_tocando:
+        #  pygame.mixer.music.load("Menu/pain.mp3")
+        #  pygame.mixer.music.play(loops=0)
+        #  musica_tocando = True
 
     mouse_pos = pygame.mouse.get_pos()
 
