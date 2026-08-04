@@ -5,6 +5,7 @@ import math
 def main():
     # 1. INICIALIZAÇÃO
     pygame.init()
+    pygame.mixer.init()  # Inicializa o sistema de áudio
 
     # Resolução 960x540
     LARGURA = 960
@@ -20,7 +21,10 @@ def main():
     VERMELHO = (230, 50, 50)
     AZUL = (50, 100, 230)
     CINZA = (180, 180, 180)
+    CINZA_ESCURO = (40, 40, 40)
     VERDE = (40, 180, 80)
+    AMARELO = (240, 220, 50)
+    VERDE_LIME = (50, 230, 100)
 
     fonte_titulo = pygame.font.SysFont(None, 45)
     fonte_texto = pygame.font.SysFont(None, 24)
@@ -34,7 +38,7 @@ def main():
     # 3. IMAGENS E BOTÕES DE MENU
     tutorial_img = carregar_e_escalar('Pygame/teste/images/button_tutorial.png')
     hovert_img = carregar_e_escalar('Pygame/teste/images/button_hover2.png')
-    tutorial_button = tutorial_img.get_rect(center=(794, 42))
+    tutorial_button = tutorial_img.get_rect(center=(900, 42))
 
     singleplayer_img = carregar_e_escalar('Pygame/teste/images/button_singleplayer.png')
     singleplayer_button = singleplayer_img.get_rect(center=(456, 266))
@@ -79,8 +83,18 @@ def main():
     current_single = singleplayer_img
     current_multi = multiplayer_img
 
-    # 4. VARIÁVEIS DE JOGO E FÍSICA
+    # 4. CONFIGURAÇÕES GERAIS E CUSTOMIZAÇÃO
+    musica_ativa = True
+    sfx_ativo = True
+
+    cores_bola = [BRANCO, AMARELO, VERDE_LIME]
+    nomes_cores_bola = ["BRANCO", "AMARELO", "VERDE"]
+    indice_cor_bola = 0
+    cor_disco_atual = cores_bola[indice_cor_bola]
+
     limite_pontos = 5
+
+    # 5. VARIÁVEIS DE JOGO E FÍSICA
     velocidade_disco_base = 5.0
 
     disco_x = LARGURA // 2
@@ -104,6 +118,7 @@ def main():
     estado_jogo = "menu"
     tutorial_pg = 0
 
+    # FUNÇÕES AUXILIARES DE REINICIALIZAÇÃO
     def reiniciar_posicoes_single():
         nonlocal disco_x, disco_y, disco_vel_x, disco_vel_y, raq2_y
         disco_x = (LARGURA // 4) * 3
@@ -131,7 +146,26 @@ def main():
         else:
             reiniciar_posicoes_multi()
 
-    # 5. LOOP PRINCIPAL
+    # FUNÇÃO PARA CRIAR BOTÕES RETANGULARES CUSTOMIZADOS
+    def criar_botao(texto, x, y, largura, altura, cor_normal, cor_hover, pos_mouse):
+        retangulo = pygame.Rect(x, y, largura, altura)
+        clicado = False
+
+        if retangulo.collidepoint(pos_mouse):
+            pygame.draw.rect(tela, cor_hover, retangulo, border_radius=6)
+            if pygame.mouse.get_pressed()[0]:
+                clicado = True
+        else:
+            pygame.draw.rect(tela, cor_normal, retangulo, border_radius=6)
+
+        pygame.draw.rect(tela, BRANCO, retangulo, 2, border_radius=6)
+        texto_surf = fonte_texto.render(texto, True, BRANCO)
+        tela.blit(texto_surf, (x + (largura - texto_surf.get_width()) // 2, 
+                               y + (altura - texto_surf.get_height()) // 2))
+
+        return clicado
+
+    # 6. LOOP PRINCIPAL
     while True:
         relogio.tick(FPS)
         mouse_pos = pygame.mouse.get_pos()
@@ -171,12 +205,10 @@ def main():
             # CONTROLES DE MOVIMENTO DAS RAQUETES
             if estado_jogo in ("singleplayer", "multiplayer"):
                 if event.type == pygame.KEYDOWN:
-                    # No Singleplayer, o jogador usa as setas ou W/S para mover a raquete do LADO DIREITO
                     if estado_jogo == "singleplayer":
                         if event.key in (pygame.K_UP, pygame.K_w): raq2_vel_y = -velocidade_raquete
                         if event.key in (pygame.K_DOWN, pygame.K_s): raq2_vel_y = velocidade_raquete
 
-                    # No Multiplayer: Player 1 (W/S) e Player 2 (Setas)
                     elif estado_jogo == "multiplayer":
                         if event.key == pygame.K_w: raq1_vel_y = -velocidade_raquete
                         if event.key == pygame.K_s: raq1_vel_y = velocidade_raquete
@@ -229,53 +261,94 @@ def main():
             tela.blit(quit_img, quit_btn)
             tela.blit(tutorial_imgs[tutorial_pg], tutorial_coords[tutorial_pg])
 
-        # TELA: CUSTOMIZAÇÃO
+        # TELA: CUSTOMIZAÇÃO (CONFIGURAÇÕES GERAIS)
         elif estado_jogo == "custom":
-            custom_page = pygame.image.load('Pygame/teste/images/shrek.png').convert_alpha() 
-            scaled_image = pygame.transform.scale(custom_page, (LARGURA, ALTURA)) 
-            tela.blit(scaled_image, (0, 0))
+            tela.fill(CINZA_ESCURO)
+
+            # Título da tela
+            txt_titulo = fonte_titulo.render("CONFIGURAÇÕES GERAIS", True, BRANCO)
+            tela.blit(txt_titulo, (LARGURA // 2 - txt_titulo.get_width() // 2, 40))
+
+            # --- 1. MÚSICA ON/OFF ---
+            txt_musica = fonte_texto.render("MÚSICA:", True, BRANCO)
+            tela.blit(txt_musica, (250, 130))
+            st_musica = "ON" if musica_ativa else "OFF"
+            cor_m = VERDE if musica_ativa else VERMELHO
+            if criar_botao(st_musica, 500, 120, 120, 35, cor_m, CINZA, mouse_pos):
+                musica_ativa = not musica_ativa
+                if not musica_ativa:
+                    pygame.mixer.music.stop()
+                pygame.time.delay(150)
+
+            # --- 2. EFEITOS SONOROS (SFX) ON/OFF ---
+            txt_sfx = fonte_texto.render("EFEITOS SONOROS:", True, BRANCO)
+            tela.blit(txt_sfx, (250, 190))
+            st_sfx = "ON" if sfx_ativo else "OFF"
+            cor_s = VERDE if sfx_ativo else VERMELHO
+            if criar_botao(st_sfx, 500, 180, 120, 35, cor_s, CINZA, mouse_pos):
+                sfx_ativo = not sfx_ativo
+                pygame.time.delay(150)
+
+            # --- 3. COR DA BOLA ---
+            txt_cor = fonte_texto.render("COR DA BOLA:", True, BRANCO)
+            tela.blit(txt_cor, (250, 250))
+            if criar_botao(nomes_cores_bola[indice_cor_bola], 500, 240, 120, 35, CINZA_ESCURO, CINZA, mouse_pos):
+                indice_cor_bola = (indice_cor_bola + 1) % len(cores_bola)
+                cor_disco_atual = cores_bola[indice_cor_bola]
+                pygame.time.delay(150)
+
+            # --- 4. QUANTIDADE DE PONTOS ---
+            txt_pts = fonte_texto.render("LIMITE DE PONTOS:", True, BRANCO)
+            tela.blit(txt_pts, (250, 310))
+            
+            # Botão de diminuir pontos
+            if criar_botao("-", 480, 300, 35, 35, CINZA_ESCURO, CINZA, mouse_pos):
+                if limite_pontos > 1:
+                    limite_pontos -= 1
+                    pygame.time.delay(150)
+
+            txt_num_pts = fonte_texto.render(str(limite_pontos), True, BRANCO)
+            tela.blit(txt_num_pts, (535, 310))
+
+            # Botão de aumentar pontos
+            if criar_botao("+", 570, 300, 35, 35, CINZA_ESCURO, CINZA, mouse_pos):
+                limite_pontos += 1
+                pygame.time.delay(150)
+
+            # Botão de Sair no Canto Inferior Esquerdo
             tela.blit(quit_img, quit_btn)
 
-        # MODO SINGLEPLAYER (JOGADOR NO LADO DIREITO)
+        # MODO SINGLEPLAYER
         elif estado_jogo == "singleplayer":
-            # Movimentação Raquete Jogador (Direita)
             raq2_y = max(raq_raio, min(ALTURA - raq_raio, raq2_y + raq2_vel_y))
 
-            # Movimentação Disco
             disco_x += disco_vel_x
             disco_y += disco_vel_y
 
-            # Colisão Bordas Superior / Inferior
             if disco_y - disco_raio <= 0 or disco_y + disco_raio >= ALTURA:
                 disco_vel_y *= -1
 
-            # Colisão com a Parede Esquerda (O disco rebate de volta)
             if disco_x - disco_raio <= 0:
                 disco_vel_x = abs(disco_vel_x)
-                pontos_p2 += 1  # Pontuação do jogador da direita
+                pontos_p2 += 1
 
-            # Colisão Raquete do Jogador (Lado Direito)
             dist_p2 = math.hypot(disco_x - raq2_x, disco_y - raq2_y)
             if dist_p2 <= (disco_raio + raq_raio):
                 disco_vel_x = -abs(disco_vel_x)
 
-            # Caso o disco passe do jogador na direita, reinicia
             if disco_x > LARGURA:
                 reiniciar_posicoes_single()
 
-            # Desenhar Campo Singleplayer
             tela.fill(PRETO)
-            pygame.draw.line(tela, CINZA, (5, 0), (5, ALTURA), 10) # Parede alvo na esquerda
+            pygame.draw.line(tela, CINZA, (5, 0), (5, ALTURA), 10)
 
-            # Raquete Azul (Direita) e Disco
+            # Raquete e Disco (utilizando a cor customizada)
             pygame.draw.circle(tela, AZUL, (int(raq2_x), int(raq2_y)), raq_raio)
-            pygame.draw.circle(tela, BRANCO, (int(disco_x), int(disco_y)), disco_raio)
+            pygame.draw.circle(tela, cor_disco_atual, (int(disco_x), int(disco_y)), disco_raio)
 
-            # Placar de Pontos
             txt_p = fonte_placar.render(f"Pontos: {pontos_p2}", True, BRANCO)
             tela.blit(txt_p, (LARGURA // 2 - txt_p.get_width() // 2, 15))
 
-            # Botão de Sair no Canto Inferior Esquerdo
             tela.blit(quit_img, quit_btn)
 
         # MODO MULTIPLAYER
@@ -316,12 +389,11 @@ def main():
 
             pygame.draw.circle(tela, VERMELHO, (int(raq1_x), int(raq1_y)), raq_raio)
             pygame.draw.circle(tela, AZUL, (int(raq2_x), int(raq2_y)), raq_raio)
-            pygame.draw.circle(tela, BRANCO, (int(disco_x), int(disco_y)), disco_raio)
+            pygame.draw.circle(tela, cor_disco_atual, (int(disco_x), int(disco_y)), disco_raio)
 
             txt_p = fonte_placar.render(f"{pontos_p1}   {pontos_p2}", True, BRANCO)
             tela.blit(txt_p, (LARGURA // 2 - txt_p.get_width() // 2, 15))
 
-            # Botão de Sair no Canto Inferior Esquerdo
             tela.blit(quit_img, quit_btn)
 
             if vencedor != "":
