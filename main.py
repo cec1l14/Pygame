@@ -267,14 +267,16 @@ def main():
             if abs(scroll) > largura_fundo: 
                 scroll = 0
 
+            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
             tutorial_main_img = carregar_e_escalar('images/tutorial_main.png')
             tela.blit(tutorial_main_img, tutorial_main_img.get_rect(center=(480, 280)))
             tela.blit(tutorial_back_img, tutorial_back) 
             tela.blit(tutorial_forward_img, tutorial_forward) 
-            tela.blit(back_img, back_button)
+            tela.blit(current_quit, quit_button)
             tela.blit(tutorial_imgs[tutorial_pg], tutorial_coords[tutorial_pg])
 
         elif estado_jogo == "custom":
+
             for i in range(0, tiles): 
                 tela.blit(fundo, (i * largura_fundo + scroll, 0))
 
@@ -292,6 +294,7 @@ def main():
 
             tela.blit(fonte_texto.render("Música de Fundo", True, CINZA_ROXO), (LARGURA // 2 - 240, 150))
             st_m = "LIGADO" if musica_ativa else "DESLIGADO"
+
             if criar_botao(tela, st_m, LARGURA // 2 + 100, 142, 130, 32, VERDE_LILAS if musica_ativa else VERMELHO_ROXO, CINZA_ROXO, mouse_pos):
                 musica_ativa = not musica_ativa
                 if not musica_ativa: 
@@ -324,9 +327,11 @@ def main():
                 limite_pontos += 1
                 pygame.time.delay(150)
 
-            tela.blit(back_img, back_button)
+            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
+            tela.blit(current_quit, quit_button)
 
         elif estado_jogo == "singleplayer":
+
             raq2_y = max(raq_raio, min(ALTURA - raq_raio, raq2_y + raq2_vel_y))
             disco_x += disco_vel_x
             disco_y += disco_vel_y
@@ -351,8 +356,10 @@ def main():
             desenhar_disco(tela, disco_x, disco_y, disco_raio, cor_disco_atual)
 
             txt_p = fonte_placar.render(f"Pontos: {pontos_p2}", True, COR_ELEMENTOS)
-            tela.blit(txt_p, (LARGURA // 2 - txt_p.get_width() // 2, 15))
-            tela.blit(back_img, back_button)
+            tela.blit(txt_p, (800, 30))
+
+            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
+            tela.blit(current_quit, quit_button)
 
         elif estado_jogo == "multiplayer":
             if vencedor == "":
@@ -399,7 +406,8 @@ def main():
 
             txt_p = fonte_placar.render(f"{pontos_p1}   {pontos_p2}", True, COR_ELEMENTOS)
             tela.blit(txt_p, (LARGURA // 2 - txt_p.get_width() // 2, 15))
-            tela.blit(back_img, back_button)
+            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
+            tela.blit(current_quit, quit_button)
 
             if vencedor != "":
                 for i in range(0, tiles):
