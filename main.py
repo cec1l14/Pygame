@@ -11,10 +11,6 @@ from draws import (
     desenhar_raquete, desenhar_disco, 
     desenhar_campo_personalizado, criar_botao
 )
-import draws
-
-
-# --- FUNÇÕES DE SUPORTE (FORA DO MAIN) ---
 
 def reiniciar_posicoes_single(altura, largura, vel_base):
     """Reinicia as posições e velocidade para o modo Singleplayer."""
@@ -64,7 +60,7 @@ def main():
     pygame.init()
 
     tela = pygame.display.set_mode((LARGURA, ALTURA))
-    pygame.display.set_caption("Air Hockey - Roxo & Lilás")
+    pygame.display.set_caption("Air Hockey")
     relogio = pygame.time.Clock()
 
     # Carregamento de Imagens e Assets
@@ -125,16 +121,13 @@ def main():
     scroll = 0
     tiles = math.ceil(LARGURA / largura_fundo) + 1
 
-    # Configurações do Jogo
-    musica_ativa = True
-    sfx_ativo = True
     cores_bola = [COR_ELEMENTOS, BRANCO, (240, 190, 255), (190, 90, 240)]
     nomes_cores_bola = ["LILÁS", "BRANCO", "ORQUÍDEA", "ROXO NEON"]
     indice_cor_bola = 0
     cor_disco_atual = cores_bola[indice_cor_bola]
     limite_pontos = 5
 
-    # Física do Disco e Raquetes
+
     velocidade_disco_base = 7.0
     disco_x, disco_y = LARGURA // 2, ALTURA // 2
     disco_raio = 20
@@ -156,7 +149,7 @@ def main():
     estado_jogo = "menu"
     tutorial_pg = 0
 
-    # LOOP PRINCIPAL
+
     while True:
         relogio.tick(FPS)
         mouse_pos = pygame.mouse.get_pos()
@@ -237,7 +230,6 @@ def main():
                         if event.key in (pygame.K_UP, pygame.K_DOWN): 
                             raq2_vel_y = 0
 
-        # --- TELAS E RENDERIZAÇÃO ---
         if estado_jogo == "menu":
             current_single = hover_img if singleplayer_button.collidepoint(mouse_pos) else singleplayer_img
             current_multi = hover_img if multiplayer_button.collidepoint(mouse_pos) else multiplayer_img
@@ -284,7 +276,7 @@ def main():
             if abs(scroll) > largura_fundo: 
                 scroll = 0
 
-            painel = pygame.Surface((600, 380), pygame.SRCALPHA)
+            painel = pygame.Surface((600, 380))
             painel.fill((25, 10, 35, 230))
             tela.blit(painel, (LARGURA // 2 - 300, 60))
             pygame.draw.rect(tela, COR_ELEMENTOS, (LARGURA // 2 - 300, 60, 600, 380), 2, border_radius=12)
@@ -292,41 +284,25 @@ def main():
             txt_titulo = fonte_titulo.render("CONFIGURAÇÕES", True, COR_ELEMENTOS)
             tela.blit(txt_titulo, (LARGURA // 2 - txt_titulo.get_width() // 2, 80))
 
-            tela.blit(fonte_texto.render("Música de Fundo", True, CINZA_ROXO), (LARGURA // 2 - 240, 150))
-            st_m = "LIGADO" if musica_ativa else "DESLIGADO"
-
-            if criar_botao(tela, st_m, LARGURA // 2 + 100, 142, 130, 32, VERDE_LILAS if musica_ativa else VERMELHO_ROXO, CINZA_ROXO, mouse_pos):
-                musica_ativa = not musica_ativa
-                if not musica_ativa: 
-                    pygame.mixer.music.stop()
-                pygame.time.delay(150)
-
-            tela.blit(fonte_texto.render("Efeitos Sonoros", True, CINZA_ROXO), (LARGURA // 2 - 240, 210))
-            st_s = "LIGADO" if sfx_ativo else "DESLIGADO"
-            if criar_botao(tela, st_s, LARGURA // 2 + 100, 202, 130, 32, VERDE_LILAS if sfx_ativo else VERMELHO_ROXO, CINZA_ROXO, mouse_pos):
-                sfx_ativo = not sfx_ativo
-                pygame.time.delay(150)
-
-            tela.blit(fonte_texto.render("Cor do Disco", True, CINZA_ROXO), (LARGURA // 2 - 240, 270))
-            desenhar_disco(tela, LARGURA // 2 + 70, 278, 12, cor_disco_atual)
-            if criar_botao(tela, nomes_cores_bola[indice_cor_bola], LARGURA // 2 + 100, 262, 130, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
+            tela.blit(fonte_texto.render("Cor do Disco", True, CINZA_ROXO), (LARGURA // 2 - 240, 190))
+            desenhar_disco(tela, LARGURA // 2 + 70, 198, 12, cor_disco_atual)
+            if criar_botao(tela, nomes_cores_bola[indice_cor_bola], LARGURA // 2 + 100, 182, 130, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
                 indice_cor_bola = (indice_cor_bola + 1) % len(cores_bola)
                 cor_disco_atual = cores_bola[indice_cor_bola]
                 pygame.time.delay(150)
 
-            tela.blit(fonte_texto.render("Limite de Pontos", True, CINZA_ROXO), (LARGURA // 2 - 240, 330))
-            if criar_botao(tela, "-", LARGURA // 2 + 100, 322, 35, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
+            tela.blit(fonte_texto.render("Limite de Pontos", True, CINZA_ROXO), (LARGURA // 2 - 240, 250))
+            if criar_botao(tela, "-", LARGURA // 2 + 100, 242, 35, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
                 if limite_pontos > 1: 
                     limite_pontos -= 1
                     pygame.time.delay(150)
             
             txt_pts = fonte_texto.render(str(limite_pontos), True, BRANCO)
-            tela.blit(txt_pts, (LARGURA // 2 + 152 - txt_pts.get_width() // 2, 330))
+            tela.blit(txt_pts, (LARGURA // 2 + 152 - txt_pts.get_width() // 2, 250))
 
-            if criar_botao(tela, "+", LARGURA // 2 + 170, 322, 35, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
+            if criar_botao(tela, "+", LARGURA // 2 + 170, 242, 35, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
                 limite_pontos += 1
                 pygame.time.delay(150)
-
             current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
             tela.blit(current_quit, quit_button)
 
@@ -347,7 +323,7 @@ def main():
             if math.hypot(disco_x - raq2_x, disco_y - raq2_y) <= (disco_raio + raq_raio):
                 disco_vel_x = -abs(disco_vel_x)
 
-            # Atribuição do retorno corrigida
+            
             if disco_x > LARGURA + disco_raio: 
                 disco_x, disco_y, disco_vel_x, disco_vel_y, raq2_y = reiniciar_posicoes_single(ALTURA, LARGURA, velocidade_disco_base)
 
@@ -377,7 +353,7 @@ def main():
                 if math.hypot(disco_x - raq2_x, disco_y - raq2_y) <= (disco_raio + raq_raio): 
                     disco_vel_x = -abs(disco_vel_x)
 
-                # Atribuições dos retornos corrigidas
+
                 if disco_x - disco_raio <= 0:
                     if gol_topo <= disco_y <= gol_fundo: 
                         pontos_p2 += 1

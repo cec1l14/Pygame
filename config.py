@@ -26,7 +26,7 @@ fonte_titulo = pygame.font.SysFont(None, 45)
 fonte_texto = pygame.font.SysFont(None, 24)
 fonte_placar = pygame.font.SysFont(None, 40)
 
-# 4. FUNÇÃO DE CARREGAMENTO DE IMAGEM (gemini)
+
 def carregar_e_escalar(caminho, proporcao=0.5):
     img = pygame.image.load(caminho).convert_alpha()
     novo_tam = (int(img.get_width() * proporcao), int(img.get_height() * proporcao))
