@@ -9,7 +9,7 @@ quit_btn = None
 
 
 def desenhar_raquete(tela, x, y, raio_base, cor_principal):
-    # testando 3d
+
     pygame.draw.circle(tela, (15, 5, 20), (int(x) + 3, int(y) + 3), raio_base)
     pygame.draw.circle(tela, cor_principal, (int(x), int(y)), raio_base)
 
@@ -31,7 +31,6 @@ def desenhar_disco(tela, x, y, raio, cor):
     pygame.draw.circle(tela, cor, (int(x), int(y)), raio)
     pygame.draw.circle(tela, (80, 40, 100), (int(x), int(y)), raio, 2)
     pygame.draw.circle(tela, BRANCO, (int(x) - 3, int(y) - 3), 4)
-
 
 
 def desenhar_campo_personalizado(tela, gol_topo, altura_gol, is_singleplayer=False):

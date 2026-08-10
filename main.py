@@ -4,7 +4,7 @@ import math
 
 from config import (
     LARGURA, ALTURA, FPS, COR_ELEMENTOS, BRANCO, CINZA_ROXO,
-    ROXO_ESCURO, VERDE_LILAS, VERMELHO_ROXO, ROXO_P1, LILAS_P2,
+    ROXO_ESCURO, ROXO_P1, LILAS_P2,
     fonte_titulo, fonte_texto, fonte_placar, carregar_e_escalar
 )
 from draws import (
@@ -13,7 +13,7 @@ from draws import (
 )
 
 def reiniciar_posicoes_single(altura, largura, vel_base):
-    """Reinicia as posições e velocidade para o modo Singleplayer."""
+    
     disco_x = (largura // 4) * 3
     disco_y = altura // 2
     raq2_y = altura // 2
@@ -24,7 +24,7 @@ def reiniciar_posicoes_single(altura, largura, vel_base):
 
 
 def reiniciar_posicoes_multi(altura, largura, vel_base):
-    """Reinicia as posições e velocidade para o modo Multiplayer."""
+    
     disco_x = largura // 2
     disco_y = altura // 2
     raq1_y = altura // 2
@@ -36,7 +36,7 @@ def reiniciar_posicoes_multi(altura, largura, vel_base):
 
 
 def reiniciar_jogo_completo(estado_jogo, altura, largura, vel_base):
-    """Reinicia o placar e chama o reset de posições apropriado."""
+    
     pontos_p1 = 0
     pontos_p2 = 0
     vencedor = ""
@@ -54,16 +54,19 @@ def reiniciar_jogo_completo(estado_jogo, altura, largura, vel_base):
     return pontos_p1, pontos_p2, vencedor, disco_x, disco_y, disco_vel_x, disco_vel_y, raq1_y, raq2_y
 
 
-# --- FUNÇÃO PRINCIPAL ---
-
 def main():
     pygame.init()
+
+    pygame.mixer.init()  
+    pygame.mixer.music.load('sounds/munkin_oleg-thunderbird-game-over-9232.mp3')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
 
     tela = pygame.display.set_mode((LARGURA, ALTURA))
     pygame.display.set_caption("Air Hockey")
     relogio = pygame.time.Clock()
 
-    # Carregamento de Imagens e Assets
+    
     title_img = carregar_e_escalar('images/title.png')
     title_scr = title_img.get_rect(center=(480, 140))
 
@@ -95,12 +98,24 @@ def main():
     tutorial_0_img = carregar_e_escalar('images/tutorial0.png')
     tutorial_1_img = carregar_e_escalar('images/tutorial1.png')
     tutorial_2_img = carregar_e_escalar('images/tutorial2.png')
+    tutorial_0_img = pygame.transform.scale(tutorial_0_img, (300,300))
+    tutorial_1_img = pygame.transform.scale(tutorial_1_img, (300,300))
+    tutorial_2_img = pygame.transform.scale(tutorial_2_img, (300,300))
+
 
     tutorial_imgs = {0: tutorial_0_img, 1: tutorial_1_img, 2: tutorial_2_img}
     tutorial_coords = {
-        0: tutorial_0_img.get_rect(center=(480, 300)),
-        1: tutorial_1_img.get_rect(center=(480, 300)),
-        2: tutorial_2_img.get_rect(center=(480, 300))
+        0: tutorial_0_img.get_rect(center=(480, 270)),
+        1: tutorial_1_img.get_rect(center=(480, 270)),
+        2: tutorial_2_img.get_rect(center=(480, 270))
+    }
+    fonte_tutorial = pygame.font.SysFont("arial", 22, True, False)
+
+
+    textos_tutorial = {
+        0: "MOVIMENTO: Use W/S ou Setas para mover sua raquete.",
+        1: "REBATE: Impacte o disco para rebatê-lo ao campo rival.",
+        2: "PONTUAÇÃO: Faça gols no adversário para vencer a partida!"
     }
 
     tutorial_back_img = carregar_e_escalar('images/tutorial_back.png')
@@ -126,7 +141,6 @@ def main():
     indice_cor_bola = 0
     cor_disco_atual = cores_bola[indice_cor_bola]
     limite_pontos = 5
-
 
     velocidade_disco_base = 7.0
     disco_x, disco_y = LARGURA // 2, ALTURA // 2
@@ -219,7 +233,7 @@ def main():
                             raq2_vel_y = velocidade_raquete
                     if event.key == pygame.K_ESCAPE: 
                         estado_jogo = "menu"
-               
+                
                 if event.type == pygame.KEYUP:
                     if estado_jogo == "singleplayer":
                         if event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_w, pygame.K_s): 
@@ -259,14 +273,18 @@ def main():
             if abs(scroll) > largura_fundo: 
                 scroll = 0
 
-            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
+            current_back = hovert_img if back_button.collidepoint(mouse_pos) else back_img
             tutorial_main_img = carregar_e_escalar('images/tutorial_main.png')
             tela.blit(tutorial_main_img, tutorial_main_img.get_rect(center=(480, 280)))
             tela.blit(tutorial_back_img, tutorial_back) 
             tela.blit(tutorial_forward_img, tutorial_forward) 
-            tela.blit(current_quit, quit_button)
+            tela.blit(current_back, back_button)
             tela.blit(tutorial_imgs[tutorial_pg], tutorial_coords[tutorial_pg])
 
+            txt_instrucao = fonte_tutorial.render(textos_tutorial[tutorial_pg], True, LILAS_P2)
+            
+            pygame.draw.rect(tela, (61, 3, 150), (LARGURA // 2 - txt_instrucao.get_width() // 2 - 10, 450, txt_instrucao.get_width() + 20, txt_instrucao.get_height() + 10))
+            tela.blit(txt_instrucao, (LARGURA // 2 - txt_instrucao.get_width() // 2, 450))
         elif estado_jogo == "custom":
 
             for i in range(0, tiles): 
@@ -303,8 +321,8 @@ def main():
             if criar_botao(tela, "+", LARGURA // 2 + 170, 242, 35, 32, ROXO_ESCURO, CINZA_ROXO, mouse_pos):
                 limite_pontos += 1
                 pygame.time.delay(150)
-            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
-            tela.blit(current_quit, quit_button)
+            current_back = hovert_img if back_button.collidepoint(mouse_pos) else back_img
+            tela.blit(current_back, back_button)
 
         elif estado_jogo == "singleplayer":
 
@@ -334,8 +352,8 @@ def main():
             txt_p = fonte_placar.render(f"Pontos: {pontos_p2}", True, COR_ELEMENTOS)
             tela.blit(txt_p, (800, 30))
 
-            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
-            tela.blit(current_quit, quit_button)
+            current_back = hovert_img if back_button.collidepoint(mouse_pos) else back_img
+            tela.blit(current_back, back_button)
 
         elif estado_jogo == "multiplayer":
             if vencedor == "":
@@ -382,9 +400,8 @@ def main():
 
             txt_p = fonte_placar.render(f"{pontos_p1}   {pontos_p2}", True, COR_ELEMENTOS)
             tela.blit(txt_p, (LARGURA // 2 - txt_p.get_width() // 2, 15))
-            current_quit = hovert_img if quit_button.collidepoint(mouse_pos) else quit_img
-            tela.blit(current_quit, quit_button)
-
+            current_back = hovert_img if back_button.collidepoint(mouse_pos) else back_img
+            tela.blit(current_back, back_button)
             if vencedor != "":
                 for i in range(0, tiles):
                     tela.blit(fundo, (i * largura_fundo + scroll, 0))
@@ -392,6 +409,7 @@ def main():
                 scroll -= 2
                 if abs(scroll) > largura_fundo: 
                     scroll = 0
+
                 tela.blit(vencedor, vencedor_scr)
                 tela.blit(new_game_img, new_game)
                 tela.blit(back2_img, back2_button)
