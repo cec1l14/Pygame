@@ -1,17 +1,12 @@
 import pygame
 from config import (
     BRANCO, COR_FUNDO, COR_ELEMENTOS, COR_PONTOS,
-    fonte_texto, carregar_e_escalar, LARGURA, ALTURA
+    fonte_texto, LARGURA, ALTURA
 )
 
 quit_img = None
 quit_btn = None
 
-def carregar_assets_draws():
-    
-    global quit_img, quit_btn
-    quit_img = carregar_e_escalar('images/button_quit.png')
-    quit_btn = quit_img.get_rect(bottomleft=(20, ALTURA - 20))
 
 def desenhar_raquete(tela, x, y, raio_base, cor_principal):
     # testando 3d
@@ -37,9 +32,7 @@ def desenhar_disco(tela, x, y, raio, cor):
     pygame.draw.circle(tela, (80, 40, 100), (int(x), int(y)), raio, 2)
     pygame.draw.circle(tela, BRANCO, (int(x) - 3, int(y) - 3), 4)
 
-def desenhar_botao_sair(tela):
-    
-    tela.blit(quit_img, quit_btn)
+
 
 def desenhar_campo_personalizado(tela, gol_topo, altura_gol, is_singleplayer=False):
     
